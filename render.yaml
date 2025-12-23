@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ai-chat-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: MODEL
+        value: openai/gpt-3.5-turbo
+      - key: MAX_TOKENS
+        value: 500
+      - key: TEMPERATURE
+        value: 0.7
