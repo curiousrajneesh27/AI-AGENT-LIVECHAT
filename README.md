@@ -43,37 +43,10 @@ A full-stack AI chat application with conversation persistence, session manageme
 
 ## 🏗️ System Architecture
 
-### High-Level Design
+![Uploading diagram-export-12-23-2025-4_55_10-PM.png…]()
 
-```
-Frontend (React)  →  Backend API (Express)  →  LLM Provider (OpenRouter)
-                            ↓
-                     Database (SQLite)
-```
 
-**Three-Tier Architecture:**
 
-- **Frontend**: React + TypeScript, session management, API client
-- **Backend**: Express + TypeScript, REST API, business logic
-- **Database**: SQLite with conversations and messages tables
-
-**Request Flow:**
-
-1. User sends message → Frontend validates
-2. POST to `/api/chat/message` → Backend validates with Zod
-3. Find/create conversation → Save user message
-4. Fetch history (last 10 messages) → Call LLM API
-5. Save AI response → Return to frontend
-6. Display message with typing indicator
-
----
-
-| :----------------------------------------------------: | :-------------: | :------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Rajneesh Verma](https://github.com/curiousrajneesh27) | ~8 hours | Dec 23, 2025 | [![Stars](https://img.shields.io/github/stars/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/stargazers) | [![Forks](https://img.shields.io/github/forks/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/network/members) |
-
-</div>
-
----
 
 ## ✨ Features
 
