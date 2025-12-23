@@ -148,6 +148,7 @@ User Input → Frontend Validation → API Request
 ```
 
 **Frontend Process**:
+
 1. User types message in chat input
 2. Click send button
 3. Validate locally (not empty)
@@ -156,6 +157,7 @@ User Input → Frontend Validation → API Request
 6. Disable input during processing
 
 **Request Payload**:
+
 ```json
 {
   "message": "What's your return policy?",
@@ -172,12 +174,14 @@ API Gateway → Validation → Route Handler
 ```
 
 **Validation Layer** (`middleware/validation.ts`):
+
 - Check if request body exists
 - Validate against Zod schema
 - Verify message length (1-2000 chars)
 - Return 400 error if invalid
 
 **Route Handler** (`routes/chat.ts`):
+
 - Extract `message` and `sessionId`
 - Pass to business logic
 
@@ -203,7 +207,7 @@ if (!sessionId || !(await conversationService.exists(sessionId))) {
 ```typescript
 const userMessage = await messageService.create(
   conversationId,
-  'user',
+  "user",
   message
 );
 ```
@@ -220,12 +224,13 @@ Returns last 10 messages for context.
 
 ```typescript
 const llmResponse = await generateAIReply(
-  history.slice(0, -1),  // Exclude current message
+  history.slice(0, -1), // Exclude current message
   message
 );
 ```
 
 **LLM Provider Request**:
+
 ```json
 {
   "model": "openai/gpt-3.5-turbo",
@@ -257,7 +262,7 @@ const llmResponse = await generateAIReply(
 ```typescript
 const aiMessage = await messageService.create(
   conversationId,
-  'ai',
+  "ai",
   llmResponse.reply
 );
 ```
@@ -271,6 +276,7 @@ Backend Response → Frontend Update → Display to User
 ```
 
 **Response Payload**:
+
 ```json
 {
   "success": true,
@@ -287,6 +293,7 @@ Backend Response → Frontend Update → Display to User
 ```
 
 **Frontend Processing**:
+
 1. Receive response
 2. Hide "AI is typing..." indicator
 3. Add AI message to message list
@@ -336,13 +343,14 @@ Foreign Key Constraints:
 
 Stores conversation metadata and grouping.
 
-| Column      | Type     | Constraints               | Description                              |
-|-------------|----------|---------------------------|------------------------------------------|
-| id          | TEXT     | PRIMARY KEY               | UUID v4 (e.g., "550e8400-e29b...")       |
-| created_at  | DATETIME | DEFAULT CURRENT_TIMESTAMP | ISO 8601 timestamp of creation           |
-| updated_at  | DATETIME | DEFAULT CURRENT_TIMESTAMP | ISO 8601 timestamp of last update        |
+| Column     | Type     | Constraints               | Description                        |
+| ---------- | -------- | ------------------------- | ---------------------------------- |
+| id         | TEXT     | PRIMARY KEY               | UUID v4 (e.g., "550e8400-e29b...") |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | ISO 8601 timestamp of creation     |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | ISO 8601 timestamp of last update  |
 
 **SQL Definition**:
+
 ```sql
 CREATE TABLE conversations (
   id TEXT PRIMARY KEY,
@@ -352,6 +360,7 @@ CREATE TABLE conversations (
 ```
 
 **Example Row**:
+
 ```
 id: 550e8400-e29b-41d4-a716-446655440000
 created_at: 2025-12-23 10:30:00.000
@@ -359,6 +368,7 @@ updated_at: 2025-12-23 10:35:45.123
 ```
 
 **Use Cases**:
+
 - Group messages by conversation
 - Track when conversations start/end
 - Enable conversation-level operations (delete, archive)
@@ -370,15 +380,16 @@ updated_at: 2025-12-23 10:35:45.123
 
 Stores individual messages from users and AI.
 
-| Column          | Type     | Constraints                          | Description                            |
-|-----------------|----------|--------------------------------------|----------------------------------------|
-| id              | TEXT     | PRIMARY KEY                          | UUID v4 for message                    |
-| conversation_id | TEXT     | FOREIGN KEY → conversations(id)     | Parent conversation                    |
-| sender          | TEXT     | CHECK (sender IN ('user', 'ai'))    | Message sender type                    |
-| text            | TEXT     | NOT NULL                             | Message content (max 2000 chars)       |
-| created_at      | DATETIME | DEFAULT CURRENT_TIMESTAMP            | ISO 8601 timestamp                     |
+| Column          | Type     | Constraints                      | Description                      |
+| --------------- | -------- | -------------------------------- | -------------------------------- |
+| id              | TEXT     | PRIMARY KEY                      | UUID v4 for message              |
+| conversation_id | TEXT     | FOREIGN KEY → conversations(id)  | Parent conversation              |
+| sender          | TEXT     | CHECK (sender IN ('user', 'ai')) | Message sender type              |
+| text            | TEXT     | NOT NULL                         | Message content (max 2000 chars) |
+| created_at      | DATETIME | DEFAULT CURRENT_TIMESTAMP        | ISO 8601 timestamp               |
 
 **SQL Definition**:
+
 ```sql
 CREATE TABLE messages (
   id TEXT PRIMARY KEY,
@@ -386,19 +397,20 @@ CREATE TABLE messages (
   sender TEXT NOT NULL CHECK (sender IN ('user', 'ai')),
   text TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (conversation_id) REFERENCES conversations(id) 
+  FOREIGN KEY (conversation_id) REFERENCES conversations(id)
     ON DELETE CASCADE
 );
 
 -- Performance indexes
-CREATE INDEX idx_messages_conversation_id 
+CREATE INDEX idx_messages_conversation_id
   ON messages(conversation_id);
 
-CREATE INDEX idx_messages_created_at 
+CREATE INDEX idx_messages_created_at
   ON messages(created_at);
 ```
 
 **Example Rows**:
+
 ```
 ┌──────────────────────────────────┬──────────────────────────────────┬────────┬─────────────────────────┬─────────────────────────┐
 │ id                               │ conversation_id                  │ sender │ text                    │ created_at              │
@@ -419,13 +431,15 @@ CREATE INDEX idx_messages_created_at
 ```
 
 **Relationship Rules**:
+
 - Each conversation can have 0 to unlimited messages
 - Each message belongs to exactly 1 conversation
 - Deleting a conversation deletes all its messages (CASCADE)
 
 **SQL Enforcement**:
+
 ```sql
-FOREIGN KEY (conversation_id) REFERENCES conversations(id) 
+FOREIGN KEY (conversation_id) REFERENCES conversations(id)
   ON DELETE CASCADE
 ```
 
@@ -438,8 +452,9 @@ FOREIGN KEY (conversation_id) REFERENCES conversations(id)
 **Purpose**: Fast retrieval of messages by conversation.
 
 **Query Example**:
+
 ```sql
-SELECT * FROM messages 
+SELECT * FROM messages
 WHERE conversation_id = '550e8400-e29b-41d4-a716-446655440000'
 ORDER BY created_at ASC;
 ```
@@ -456,8 +471,9 @@ ORDER BY created_at ASC;
 **Purpose**: Efficient timestamp-based ordering and filtering.
 
 **Query Example**:
+
 ```sql
-SELECT * FROM messages 
+SELECT * FROM messages
 WHERE conversation_id = '...'
 ORDER BY created_at DESC
 LIMIT 10;
@@ -477,6 +493,7 @@ VALUES ('550e8400-e29b-41d4-a716-446655440000', CURRENT_TIMESTAMP, CURRENT_TIMES
 ```
 
 **TypeScript**:
+
 ```typescript
 const newConversation = await conversationService.create();
 // Returns: { id: '550e8400-...', created_at: '2025-12-23T10:30:00.000Z', ... }
@@ -498,11 +515,12 @@ VALUES (
 ```
 
 **TypeScript**:
+
 ```typescript
 const message = await messageService.create(
   conversationId,
-  'user',
-  'What is your return policy?'
+  "user",
+  "What is your return policy?"
 );
 ```
 
@@ -518,6 +536,7 @@ ORDER BY created_at ASC;
 ```
 
 **TypeScript**:
+
 ```typescript
 const messages = await messageService.getByConversationId(conversationId);
 ```
@@ -535,8 +554,12 @@ LIMIT 10;
 ```
 
 **TypeScript**:
+
 ```typescript
-const recentMessages = await messageService.getRecentHistory(conversationId, 10);
+const recentMessages = await messageService.getRecentHistory(
+  conversationId,
+  10
+);
 ```
 
 ---
@@ -551,6 +574,7 @@ WHERE id = '550e8400-e29b-41d4-a716-446655440000';
 **Effect**: Automatically deletes all messages in that conversation due to `ON DELETE CASCADE`.
 
 **TypeScript**:
+
 ```typescript
 await conversationService.delete(conversationId);
 ```
@@ -568,12 +592,12 @@ await conversationService.delete(conversationId);
 
 ### Endpoint Summary
 
-| Method | Endpoint                          | Description                      |
-|--------|-----------------------------------|----------------------------------|
-| POST   | `/api/chat/message`               | Send message, get AI reply       |
-| GET    | `/api/chat/history/:id`           | Get conversation history         |
-| GET    | `/api/chat/health`                | Health check & system status     |
-| DELETE | `/api/chat/conversation/:id`      | Delete conversation              |
+| Method | Endpoint                     | Description                  |
+| ------ | ---------------------------- | ---------------------------- |
+| POST   | `/api/chat/message`          | Send message, get AI reply   |
+| GET    | `/api/chat/history/:id`      | Get conversation history     |
+| GET    | `/api/chat/health`           | Health check & system status |
+| DELETE | `/api/chat/conversation/:id` | Delete conversation          |
 
 ---
 
@@ -584,11 +608,13 @@ await conversationService.delete(conversationId);
 #### Request
 
 **Headers**:
+
 ```http
 Content-Type: application/json
 ```
 
 **Body** (JSON):
+
 ```json
 {
   "message": "What's your return policy?",
@@ -598,14 +624,15 @@ Content-Type: application/json
 
 **Parameters**:
 
-| Field     | Type   | Required | Constraints             | Description                          |
-|-----------|--------|----------|-------------------------|--------------------------------------|
-| message   | string | Yes      | 1-2000 characters       | User's message text                  |
-| sessionId | string | No       | Valid UUID v4           | Conversation ID (auto-created if not provided) |
+| Field     | Type   | Required | Constraints       | Description                                    |
+| --------- | ------ | -------- | ----------------- | ---------------------------------------------- |
+| message   | string | Yes      | 1-2000 characters | User's message text                            |
+| sessionId | string | No       | Valid UUID v4     | Conversation ID (auto-created if not provided) |
 
 #### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "success": true,
@@ -623,16 +650,17 @@ Content-Type: application/json
 
 **Response Fields**:
 
-| Field        | Type   | Description                                    |
-|--------------|--------|------------------------------------------------|
-| success      | boolean| Operation success status                       |
-| reply        | string | AI-generated response                          |
-| sessionId    | string | Conversation ID (use for subsequent messages)  |
-| messageId    | string | Unique ID of AI message                        |
-| timestamp    | string | ISO 8601 timestamp                             |
-| metadata     | object | Performance and LLM metadata                   |
+| Field     | Type    | Description                                   |
+| --------- | ------- | --------------------------------------------- |
+| success   | boolean | Operation success status                      |
+| reply     | string  | AI-generated response                         |
+| sessionId | string  | Conversation ID (use for subsequent messages) |
+| messageId | string  | Unique ID of AI message                       |
+| timestamp | string  | ISO 8601 timestamp                            |
+| metadata  | object  | Performance and LLM metadata                  |
 
 **Error (400 Bad Request)** - Empty Message:
+
 ```json
 {
   "success": false,
@@ -645,6 +673,7 @@ Content-Type: application/json
 ```
 
 **Error (400 Bad Request)** - Message Too Long:
+
 ```json
 {
   "success": false,
@@ -653,6 +682,7 @@ Content-Type: application/json
 ```
 
 **Error (500 Internal Server Error)** - LLM Failure:
+
 ```json
 {
   "success": false,
@@ -683,11 +713,12 @@ curl -X POST https://ai-agent-livechat.onrender.com/api/chat/message \
 
 **Path Parameters**:
 
-| Parameter      | Type   | Required | Description                   |
-|----------------|--------|----------|-------------------------------|
-| conversationId | string | Yes      | UUID of conversation          |
+| Parameter      | Type   | Required | Description          |
+| -------------- | ------ | -------- | -------------------- |
+| conversationId | string | Yes      | UUID of conversation |
 
 **Example**:
+
 ```http
 GET /api/chat/history/550e8400-e29b-41d4-a716-446655440000
 ```
@@ -695,6 +726,7 @@ GET /api/chat/history/550e8400-e29b-41d4-a716-446655440000
 #### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "success": true,
@@ -730,6 +762,7 @@ GET /api/chat/history/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Error (400 Bad Request)** - Invalid UUID:
+
 ```json
 {
   "success": false,
@@ -738,6 +771,7 @@ GET /api/chat/history/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Error (404 Not Found)**:
+
 ```json
 {
   "success": false,
@@ -766,6 +800,7 @@ GET /api/chat/health
 #### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "success": true,
@@ -791,14 +826,14 @@ GET /api/chat/health
 
 **Response Fields**:
 
-| Field              | Type   | Description                           |
-|--------------------|--------|---------------------------------------|
-| status             | string | "healthy" or "degraded"               |
-| timestamp          | string | Current server time (ISO 8601)        |
-| system.llm         | object | LLM configuration                     |
-| system.database    | string | Database connection status            |
-| system.uptime      | number | Server uptime in seconds              |
-| system.memory      | object | Memory usage (MB)                     |
+| Field           | Type   | Description                    |
+| --------------- | ------ | ------------------------------ |
+| status          | string | "healthy" or "degraded"        |
+| timestamp       | string | Current server time (ISO 8601) |
+| system.llm      | object | LLM configuration              |
+| system.database | string | Database connection status     |
+| system.uptime   | number | Server uptime in seconds       |
+| system.memory   | object | Memory usage (MB)              |
 
 #### cURL Example
 
@@ -807,6 +842,7 @@ curl https://ai-agent-livechat.onrender.com/api/chat/health
 ```
 
 **Use Cases**:
+
 - Monitoring/alerting systems (e.g., Datadog, New Relic)
 - Load balancer health checks
 - Debugging configuration issues
@@ -822,10 +858,11 @@ curl https://ai-agent-livechat.onrender.com/api/chat/health
 **Path Parameters**:
 
 | Parameter      | Type   | Required | Description                    |
-|----------------|--------|----------|--------------------------------|
+| -------------- | ------ | -------- | ------------------------------ |
 | conversationId | string | Yes      | UUID of conversation to delete |
 
 **Example**:
+
 ```http
 DELETE /api/chat/conversation/550e8400-e29b-41d4-a716-446655440000
 ```
@@ -833,6 +870,7 @@ DELETE /api/chat/conversation/550e8400-e29b-41d4-a716-446655440000
 #### Response
 
 **Success (200 OK)**:
+
 ```json
 {
   "success": true,
@@ -841,6 +879,7 @@ DELETE /api/chat/conversation/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Error (404 Not Found)**:
+
 ```json
 {
   "success": false,
@@ -849,6 +888,7 @@ DELETE /api/chat/conversation/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Error (500 Internal Server Error)**:
+
 ```json
 {
   "success": false,
@@ -870,44 +910,44 @@ curl -X DELETE https://ai-agent-livechat.onrender.com/api/chat/conversation/550e
 
 ### Backend
 
-| Technology       | Version | Purpose                                          |
-|------------------|---------|--------------------------------------------------|
-| **Node.js**      | 18+     | JavaScript runtime for server                    |
-| **TypeScript**   | 5.3+    | Type-safe JavaScript superset                    |
-| **Express.js**   | 4.18+   | Web framework for RESTful API                    |
-| **SQLite3**      | 5.1+    | Embedded SQL database                            |
-| **OpenRouter**   | Latest  | LLM API aggregation platform                     |
-| **Zod**          | 3.22+   | Runtime type checking & validation               |
-| **UUID**         | 9.0+    | RFC4122 UUID generation                          |
-| **CORS**         | 2.8+    | Cross-origin resource sharing middleware         |
-| **Dotenv**       | 16.3+   | Environment variable loader                      |
-| **Nodemon**      | 3.0+    | Development auto-restart on file changes         |
+| Technology     | Version | Purpose                                  |
+| -------------- | ------- | ---------------------------------------- |
+| **Node.js**    | 18+     | JavaScript runtime for server            |
+| **TypeScript** | 5.3+    | Type-safe JavaScript superset            |
+| **Express.js** | 4.18+   | Web framework for RESTful API            |
+| **SQLite3**    | 5.1+    | Embedded SQL database                    |
+| **OpenRouter** | Latest  | LLM API aggregation platform             |
+| **Zod**        | 3.22+   | Runtime type checking & validation       |
+| **UUID**       | 9.0+    | RFC4122 UUID generation                  |
+| **CORS**       | 2.8+    | Cross-origin resource sharing middleware |
+| **Dotenv**     | 16.3+   | Environment variable loader              |
+| **Nodemon**    | 3.0+    | Development auto-restart on file changes |
 
 ### Frontend
 
-| Technology       | Version | Purpose                                          |
-|------------------|---------|--------------------------------------------------|
-| **React**        | 18.2+   | Component-based UI framework                     |
-| **TypeScript**   | 5.3+    | Type-safe JavaScript                             |
-| **Vite**         | 5.0+    | Fast build tool & dev server                     |
-| **CSS3**         | -       | Modern styling (Flexbox, Grid, animations)       |
+| Technology     | Version | Purpose                                    |
+| -------------- | ------- | ------------------------------------------ |
+| **React**      | 18.2+   | Component-based UI framework               |
+| **TypeScript** | 5.3+    | Type-safe JavaScript                       |
+| **Vite**       | 5.0+    | Fast build tool & dev server               |
+| **CSS3**       | -       | Modern styling (Flexbox, Grid, animations) |
 
 ### DevOps & Hosting
 
-| Platform         | Tier    | Purpose                                          |
-|------------------|---------|--------------------------------------------------|
-| **Render.com**   | Free    | Backend hosting (auto-deploy from GitHub)        |
-| **Vercel**       | Free    | Frontend hosting (auto-deploy from GitHub)       |
-| **GitHub**       | Free    | Version control & CI/CD trigger                  |
+| Platform       | Tier | Purpose                                    |
+| -------------- | ---- | ------------------------------------------ |
+| **Render.com** | Free | Backend hosting (auto-deploy from GitHub)  |
+| **Vercel**     | Free | Frontend hosting (auto-deploy from GitHub) |
+| **GitHub**     | Free | Version control & CI/CD trigger            |
 
 ### Development Tools
 
-| Tool             | Purpose                                          |
-|------------------|--------------------------------------------------|
-| **npm**          | Package manager                                  |
-| **Git**          | Version control                                  |
-| **VS Code**      | Code editor (recommended)                        |
-| **Postman**      | API testing (optional)                           |
+| Tool        | Purpose                   |
+| ----------- | ------------------------- |
+| **npm**     | Package manager           |
+| **Git**     | Version control           |
+| **VS Code** | Code editor (recommended) |
+| **Postman** | API testing (optional)    |
 
 ---
 
@@ -986,18 +1026,18 @@ MAX_MESSAGE_LENGTH=2000
 
 **Environment Variable Explanations**:
 
-| Variable             | Description                                              | Default                  |
-|----------------------|----------------------------------------------------------|--------------------------|
-| OPENROUTER_API_KEY   | Your OpenRouter API key (required)                       | -                        |
-| YOUR_SITE_URL        | Your website URL (for OpenRouter analytics)              | -                        |
-| YOUR_SITE_NAME       | Your website name (for OpenRouter analytics)             | -                        |
-| PORT                 | Backend server port                                      | 5000                     |
-| NODE_ENV             | Environment (development/production)                     | development              |
-| DATABASE_PATH        | SQLite database file location                            | ./database.sqlite        |
-| MAX_TOKENS           | Maximum tokens in AI response                            | 500                      |
-| TEMPERATURE          | LLM creativity level (0-1)                               | 0.7                      |
-| MODEL                | LLM model identifier                                     | openai/gpt-3.5-turbo     |
-| MAX_MESSAGE_LENGTH   | Max characters per user message                          | 2000                     |
+| Variable           | Description                                  | Default              |
+| ------------------ | -------------------------------------------- | -------------------- |
+| OPENROUTER_API_KEY | Your OpenRouter API key (required)           | -                    |
+| YOUR_SITE_URL      | Your website URL (for OpenRouter analytics)  | -                    |
+| YOUR_SITE_NAME     | Your website name (for OpenRouter analytics) | -                    |
+| PORT               | Backend server port                          | 5000                 |
+| NODE_ENV           | Environment (development/production)         | development          |
+| DATABASE_PATH      | SQLite database file location                | ./database.sqlite    |
+| MAX_TOKENS         | Maximum tokens in AI response                | 500                  |
+| TEMPERATURE        | LLM creativity level (0-1)                   | 0.7                  |
+| MODEL              | LLM model identifier                         | openai/gpt-3.5-turbo |
+| MAX_MESSAGE_LENGTH | Max characters per user message              | 2000                 |
 
 ---
 
@@ -1010,18 +1050,21 @@ npm run dev
 ```
 
 This starts:
+
 - 🟢 Backend API on `http://localhost:5000`
 - 🟢 Frontend on `http://localhost:3000`
 
 **Option B: Run Servers Separately**
 
 **Terminal 1** (Backend):
+
 ```bash
 cd backend
 npm run dev
 ```
 
 **Terminal 2** (Frontend):
+
 ```bash
 cd frontend
 npm run dev
@@ -1040,11 +1083,13 @@ npm run dev
 ### Verify Installation
 
 **Check Backend Health**:
+
 ```bash
 curl http://localhost:5000/api/chat/health
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -1059,6 +1104,7 @@ curl http://localhost:5000/api/chat/health
 ```
 
 **Test Message API**:
+
 ```bash
 curl -X POST http://localhost:5000/api/chat/message \
   -H "Content-Type: application/json" \
@@ -1072,24 +1118,28 @@ curl -X POST http://localhost:5000/api/chat/message \
 ### Core Functionality
 
 ✅ **Real-time AI Chat**
+
 - Powered by OpenAI GPT-3.5-turbo via OpenRouter
 - Context-aware responses using conversation history
 - Pre-loaded domain knowledge (TechGadget Store FAQs)
 - Average response time: <2 seconds
 
 ✅ **Conversation Persistence**
+
 - SQLite database for reliable message storage
 - Conversations survive page reloads/browser restarts
 - Full conversation history retrieval
 - Automatic conversation creation
 
 ✅ **Session Management**
+
 - SessionID stored in browser `sessionStorage`
 - Automatic session resumption on page load
 - Seamless conversation continuity
 - No login required
 
 ✅ **Beautiful User Interface**
+
 - Clean, modern chat design
 - Message bubbles (user: right, AI: left, different colors)
 - Timestamps for each message
@@ -1097,6 +1147,7 @@ curl -X POST http://localhost:5000/api/chat/message \
 - Mobile-responsive layout
 
 ✅ **Error Handling**
+
 - Empty message validation (frontend + backend)
 - Message length limits (2000 characters)
 - Network timeout protection (30 seconds)
@@ -1105,12 +1156,14 @@ curl -X POST http://localhost:5000/api/chat/message \
 - Graceful degradation
 
 ✅ **Input Validation**
+
 - Frontend: Real-time validation before sending
 - Backend: Zod schema validation
 - SQL injection prevention (parameterized queries)
 - XSS protection (text sanitization)
 
 ✅ **Domain Knowledge**
+
 - Pre-configured TechGadget Store FAQs:
   - Shipping policies (free shipping over $50)
   - Return policies (30-day returns)
@@ -1121,6 +1174,7 @@ curl -X POST http://localhost:5000/api/chat/message \
 ### Advanced Features
 
 🎨 **Visual Feedback**
+
 - Typing indicator ("AI is typing...")
 - Message send animation
 - Smooth auto-scroll to latest messages
@@ -1128,18 +1182,21 @@ curl -X POST http://localhost:5000/api/chat/message \
 - Loading states
 
 📱 **Responsive Design**
+
 - Works on desktop, tablet, and mobile
 - Adaptive layout (flexbox + CSS grid)
 - Touch-friendly interface
 - Optimized for all screen sizes
 
 ⚡ **Performance Optimizations**
+
 - Database indexes for fast queries
 - Optimistic UI updates (user messages appear instantly)
 - Efficient React re-renders (React.memo, useCallback)
 - Lazy loading (future enhancement)
 
 🔒 **Security**
+
 - Environment variables for secrets
 - HTTPS in production
 - CORS configuration
@@ -1229,11 +1286,13 @@ AI-AGENT-LIVECHAT/
 1. **Sign up**: Visit [render.com](https://render.com)
 
 2. **Create Web Service**:
+
    - Click "New +" → "Web Service"
    - Connect GitHub account
    - Select repository: `AI-AGENT-LIVECHAT`
 
 3. **Configure Service**:
+
    - **Name**: `ai-agent-livechat`
    - **Root Directory**: `backend`
    - **Runtime**: Node
@@ -1242,6 +1301,7 @@ AI-AGENT-LIVECHAT/
    - **Plan**: Free ($0/month)
 
 4. **Environment Variables**:
+
    ```
    OPENROUTER_API_KEY=sk-or-v1-your-key
    NODE_ENV=production
@@ -1263,20 +1323,24 @@ AI-AGENT-LIVECHAT/
 1. **Sign up**: Visit [vercel.com](https://vercel.com)
 
 2. **Import Project**:
+
    - Click "Add New..." → "Project"
    - Select `AI-AGENT-LIVECHAT` from GitHub
 
 3. **Configure**:
+
    - **Framework**: Vite
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 
 4. **Environment Variable**:
+
    ```
    VITE_API_URL=https://ai-agent-livechat.onrender.com/api
    ```
-   *(Replace with your Render backend URL)*
+
+   _(Replace with your Render backend URL)_
 
 5. **Deploy**: Click "Deploy"
 

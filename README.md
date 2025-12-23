@@ -2,103 +2,74 @@
 
 # 🤖 AI Live Chat Agent
 
-### _Production-Ready AI-Powered Customer Support_
+**Production-ready AI-powered customer support chat application**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_App-00C7B7?style=for-the-badge)](https://ai-agent-livechat.vercel.app/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT)
-[![Documentation](https://img.shields.io/badge/📖_Docs-Read_More-blue?style=for-the-badge)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/blob/main/COMPREHENSIVE_README.md)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit-00C7B7?style=flat&logo=vercel)](https://ai-agent-livechat.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT)
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?style=flat&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat)](LICENSE)
-
-**Enterprise-grade architecture • Conversation persistence • Real-time AI responses**
-
-[✨ Features](#-features) • [🚀 Quick Start](#-quick-start) • [📚 API Docs](#-api-reference) • [🏗️ Architecture](#-system-architecture) • [🌐 Deploy](#-deployment)
-
----
-
-![AI Chat Demo](https://img.shields.io/badge/✨_Interactive_Chat_UI-Responsive_Design-purple?style=for-the-badge)
-![Real-time Responses](https://img.shields.io/badge/⚡_Real--time_AI-GPT_Powered-orange?style=for-the-badge)
-![Session Persistence](https://img.shields.io/badge/💾_Smart_Sessions-Auto_Resume-blue?style=for-the-badge)
+Built with Node.js • TypeScript • React • Express • SQLite
 
 </div>
 
 ---
 
-## 💫 What Makes This Special?
+## 📋 Overview
 
-<table>
-<tr>
-<td width="50%" valign="top">
+A full-stack AI chat application with conversation persistence, session management, and intelligent response generation using OpenAI/OpenRouter APIs. Built with clean architecture, comprehensive error handling, and production-ready practices.
 
-### 🏗️ **Enterprise Architecture**
+**Key Highlights:**
 
-```
-✓ Clean 3-tier separation
-✓ Type-safe TypeScript codebase
-✓ RESTful API design
-✓ ACID-compliant SQLite
-✓ Dependency injection ready
-```
-
-</td>
-<td width="50%" valign="top">
-
-### 🚀 **Production Ready**
-
-```
-✓ Comprehensive error handling
-✓ Input validation (client + server)
-✓ Session management
-✓ Performance optimized
-✓ Docker ready
-```
-
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-### 💬 **Smart AI Integration**
-
-```
-✓ Context-aware responses
-✓ Conversation history (last 10)
-✓ Domain knowledge (TechGadget FAQs)
-✓ Timeout protection (30s)
-✓ Retry logic with exponential backoff
-```
-
-</td>
-<td width="50%" valign="top">
-
-### 🎨 **Beautiful UX**
-
-```
-✓ Modern, responsive UI
-✓ Real-time typing indicators
-✓ Auto-scroll to latest
-✓ Smooth animations
-✓ Mobile-optimized
-```
-
-</td>
-</tr>
-</table>
+- Real-time AI responses with context awareness
+- Persistent conversations using SQLite
+- Session-based chat continuity
+- Input validation (client + server)
+- Beautiful, responsive UI
 
 ---
 
-## 🌟 Project Stats
+## ✨ Features
 
-<div align="center">
+| Feature            | Description                                     |
+| :----------------- | :---------------------------------------------- |
+| 💬 **AI Chat**     | GPT-powered responses with conversation history |
+| 💾 **Persistence** | SQLite database for message storage             |
+| 🔁 **Sessions**    | Resume conversations across page reloads        |
+| 🛡️ **Validation**  | Zod schema validation on backend                |
+| 🎨 **Modern UI**   | Responsive design with typing indicators        |
+| ⚡ **Performance** | Optimized queries with database indexes         |
+| 🔒 **Security**    | Input sanitization, CORS, environment secrets   |
 
-|                     👨‍💻 **Author**                      | 🕒 **Dev Time** | 📅 **Updated** |                                                                            ⭐ **Stars**                                                                             |                                                                               🔗 **Forks**                                                                               |
+---
+
+## 🏗️ System Architecture
+
+### High-Level Design
+
+```
+Frontend (React)  →  Backend API (Express)  →  LLM Provider (OpenRouter)
+                            ↓
+                     Database (SQLite)
+```
+
+**Three-Tier Architecture:**
+
+- **Frontend**: React + TypeScript, session management, API client
+- **Backend**: Express + TypeScript, REST API, business logic
+- **Database**: SQLite with conversations and messages tables
+
+**Request Flow:**
+
+1. User sends message → Frontend validates
+2. POST to `/api/chat/message` → Backend validates with Zod
+3. Find/create conversation → Save user message
+4. Fetch history (last 10 messages) → Call LLM API
+5. Save AI response → Return to frontend
+6. Display message with typing indicator
+
+---
+
 | :----------------------------------------------------: | :-------------: | :------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Rajneesh Verma](https://github.com/curiousrajneesh27) |    ~8 hours     |  Dec 23, 2025  | [![Stars](https://img.shields.io/github/stars/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/stargazers) | [![Forks](https://img.shields.io/github/forks/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/network/members) |
+| [Rajneesh Verma](https://github.com/curiousrajneesh27) | ~8 hours | Dec 23, 2025 | [![Stars](https://img.shields.io/github/stars/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/stargazers) | [![Forks](https://img.shields.io/github/forks/curiousrajneesh27/AI-AGENT-LIVECHAT?style=social)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/network/members) |
 
 </div>
 
@@ -295,17 +266,18 @@ npm run dev
 
 ---
 
-## 📚 API Reference
+## 📚 API Endpoints
 
-<details>
-<summary><b>📌 POST /api/chat/message</b> - Send message & get AI reply</summary>
+### POST /api/chat/message
+
+Send a message and receive AI response
 
 **Request:**
 
 ```json
 {
-  "message": "What's your return policy?",
-  "sessionId": "550e8400-e29b-41d4-a716-446655440000" // optional
+  "message": "Your question here",
+  "sessionId": "optional-uuid"
 }
 ```
 
@@ -314,71 +286,26 @@ npm run dev
 ```json
 {
   "success": true,
-  "reply": "We offer a 30-day return policy...",
-  "sessionId": "550e8400-e29b-41d4-a716-446655440000",
-  "messageId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
-  "timestamp": "2025-12-23T10:30:45.123Z",
-  "metadata": {
-    "responseTime": 1234,
-    "tokensUsed": 150,
-    "model": "openai/gpt-3.5-turbo"
-  }
+  "reply": "AI response",
+  "sessionId": "uuid",
+  "messageId": "uuid",
+  "timestamp": "ISO-8601"
 }
 ```
 
-</details>
+### GET /api/chat/history/:conversationId
 
-<details>
-<summary><b>📌 GET /api/chat/history/:conversationId</b> - Get conversation history</summary>
+Retrieve conversation history
 
-**Response:**
+### GET /api/chat/health
 
-```json
-{
-  "success": true,
-  "conversationId": "550e8400-e29b-41d4-a716-446655440000",
-  "messageCount": 4,
-  "messages": [
-    {
-      "id": "...",
-      "sender": "user",
-      "text": "Hello",
-      "timestamp": "2025-12-23T10:30:00.000Z"
-    }
-  ]
-}
-```
+Check system status and health
 
-</details>
+### DELETE /api/chat/conversation/:id
 
-<details>
-<summary><b>📌 GET /api/chat/health</b> - System health check</summary>
+Delete a conversation
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "status": "healthy",
-  "system": {
-    "llm": {
-      "model": "openai/gpt-3.5-turbo",
-      "provider": "openrouter"
-    },
-    "database": "connected",
-    "uptime": 86400,
-    "memory": { "used": 45, "total": 512 }
-  }
-}
-```
-
-</details>
-
-<div align="center">
-
-📖 **Full API Documentation**: [COMPREHENSIVE_README.md](./COMPREHENSIVE_README.md#-api-endpoints-documentation)
-
-</div>
+> For detailed API documentation, see [COMPREHENSIVE_README.md](./COMPREHENSIVE_README.md)
 
 ---
 
@@ -420,162 +347,43 @@ AI-AGENT-LIVECHAT/
 
 ## 🌐 Deployment
 
-<table>
-<tr>
-<td width="50%" valign="top">
+### Frontend (Vercel)
 
-### **🎨 Frontend (Vercel)**
+1. Connect GitHub repository
+2. Set root directory: `frontend/`
+3. Build command: `npm run build`
+4. Output directory: `dist/`
+5. Add environment variable: `VITE_API_URL`
 
-```bash
-# Auto-deploy from GitHub
-1. Connect repository
-2. Root: frontend/
-3. Build: npm run build
-4. Output: dist/
-5. Env: VITE_API_URL
-```
+### Backend (Render)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT)
+1. Connect GitHub repository
+2. Set root directory: `backend/`
+3. Build command: `npm install && npm run build`
+4. Start command: `npm start`
+5. Add environment variables (see backend/.env.example)
 
-</td>
-<td width="50%" valign="top">
+**Live Application:**
 
-### **⚙️ Backend (Render)**
+- Frontend: https://ai-agent-livechat.vercel.app
+- Backend: https://ai-agent-livechat.onrender.com
 
-```bash
-# Auto-deploy from GitHub
-1. Connect repository
-2. Root: backend/
-3. Build: npm install && npm run build
-4. Start: npm start
-5. Env: OPENROUTER_API_KEY
-```
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
-
-</td>
-</tr>
-</table>
-
-<div align="center">
-
-📖 **Detailed deployment guide**: [DEPLOYMENT.md](./DEPLOYMENT.md) • [DEPLOY_NOW.md](./DEPLOY_NOW.md)
-
-</div>
+> For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ---
 
-## 🗺️ Roadmap
+## � License
 
-<table>
-<tr>
-<td width="33%" valign="top">
-
-### 🔴 **High Priority**
-
-- [ ] Authentication (JWT)
-- [ ] Redis caching
-- [ ] Streaming responses
-- [ ] Unit & E2E tests
-- [ ] Rate limiting
-
-</td>
-<td width="33%" valign="top">
-
-### 🟡 **Medium Priority**
-
-- [ ] WhatsApp integration
-- [ ] Analytics dashboard
-- [ ] Sentiment analysis
-- [ ] Multi-language support
-- [ ] File uploads
-
-</td>
-<td width="33%" valign="top">
-
-### 🟢 **Low Priority**
-
-- [ ] Voice input
-- [ ] CRM integrations
-- [ ] Custom themes
-- [ ] Export conversations
-- [ ] Admin panel
-
-</td>
-</tr>
-</table>
+MIT License - Free to use, modify, and distribute.
 
 ---
 
-## 🤝 Contributing
+## 📚 Additional Documentation
 
-Contributions are welcome! 🎉
-
-```bash
-1. Fork the repository
-2. Create feature branch (git checkout -b feature/amazing)
-3. Commit changes (git commit -m 'Add amazing feature')
-4. Push to branch (git push origin feature/amazing)
-5. Open a Pull Request
-```
-
-<div align="center">
-
-[![Contributors](https://img.shields.io/github/contributors/curiousrajneesh27/AI-AGENT-LIVECHAT?style=for-the-badge)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/graphs/contributors)
-
-</div>
+- [COMPREHENSIVE_README.md](./COMPREHENSIVE_README.md) - Detailed technical documentation
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Step-by-step deployment guide
+- [TECHNICAL_ARCHITECTURE.md](./TECHNICAL_ARCHITECTURE.md) - System architecture details
 
 ---
 
-## 📄 License
-
-<div align="center">
-
-**MIT License** - Free to use, modify, and distribute
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
-</div>
-
----
-
-## 🙏 Acknowledgments
-
-<div align="center">
-
-Special thanks to:
-
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT_Models-412991?style=flat&logo=openai&logoColor=white)](https://openai.com/)
-[![OpenRouter](https://img.shields.io/badge/OpenRouter-API_Aggregation-FF6B6B?style=flat)](https://openrouter.ai/)
-[![Render](https://img.shields.io/badge/Render-Free_Hosting-46E3B7?style=flat&logo=render&logoColor=white)](https://render.com/)
-[![Vercel](https://img.shields.io/badge/Vercel-Free_Hosting-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
-
-</div>
-
----
-
-<div align="center">
-
-## 💼 About the Developer
-
-**Rajneesh Verma** | Full-Stack Developer
-
-[![GitHub](https://img.shields.io/badge/GitHub-curiousrajneesh27-181717?style=flat&logo=github)](https://github.com/curiousrajneesh27)
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-00C7B7?style=flat&logo=google-chrome&logoColor=white)](#)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat&logo=linkedin&logoColor=white)](#)
-
----
-
-### ⭐ If you like this project, give it a star!
-
-### 💬 Have questions? [Open an issue](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT/issues/new)
-
-### 🚀 Want to contribute? [See contributing guidelines](#-contributing)
-
----
-
-**Built with ❤️ using React, TypeScript, Node.js, and GPT**
-
-_Making AI accessible, one conversation at a time._
-
-</div>
+**Built with React, TypeScript, Node.js, Express, and OpenRouter AI**
