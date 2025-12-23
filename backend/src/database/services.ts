@@ -45,7 +45,21 @@ export const conversationService = {
       'UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       id
     );
-  }
+  },
+
+  delete: async (id: string): Promise<void> => {
+    // Delete all messages first (cascade)
+    await dbRun(
+      'DELETE FROM messages WHERE conversation_id = ?',
+      id
+    );
+    
+    // Delete conversation
+    await dbRun(
+      'DELETE FROM conversations WHERE id = ?',
+      id
+    );
+  },
 };
 
 export const messageService = {
