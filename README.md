@@ -2,7 +2,7 @@
 
 A production-ready AI-powered customer support chat application built for Spur's Full-Stack Engineer take-home assignment.
 
-🔗 **Live Demo**: [Your deployment URL here]
+**Live Demo**: https://ai-agent-livechat.vercel.app/
 
 ## Features
 
@@ -12,7 +12,7 @@ A production-ready AI-powered customer support chat application built for Spur's
 ✅ **Beautiful UI**: Modern, responsive chat interface  
 ✅ **Error Handling**: Graceful handling of API failures, timeouts, and edge cases  
 ✅ **Input Validation**: Prevents empty messages, handles long inputs  
-✅ **Domain Knowledge**: Pre-loaded with fictional store FAQs  
+✅ **Domain Knowledge**: Pre-loaded with fictional store FAQs
 ✅ **Typing Indicators**: Real-time feedback during AI responses  
 ✅ **Auto-scroll**: Smooth scrolling to latest messages
 
@@ -25,6 +25,7 @@ A production-ready AI-powered customer support chat application built for Spur's
 - SQLite (better-sqlite3) for data persistence
 - OpenAI API for LLM integration
 - Zod for input validation
+- Open Router APi key
 
 **Frontend:**
 
@@ -36,6 +37,7 @@ A production-ready AI-powered customer support chat application built for Spur's
 
 - Node.js 18+ and npm
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- Open Router Api key(Preffered free api keys)
 
 ## Quick Start
 
@@ -448,10 +450,10 @@ MIT
 
 ## Author
 
-Built for Spur's Founding Full-Stack Engineer Take-Home Assignment
+Rajneesh verma 
 
 ---
 
-**Estimated Development Time**: ~10 hours
+**Estimated Development Time**: ~8 hours
 
-**Last Updated**: December 21, 2025
+**Last Updated**: December 23, 2025
