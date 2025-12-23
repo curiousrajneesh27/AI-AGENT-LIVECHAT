@@ -3,20 +3,13 @@ import { z } from 'zod';
 const MAX_MESSAGE_LENGTH = parseInt(process.env.MAX_MESSAGE_LENGTH || '2000', 10);
 const MIN_MESSAGE_LENGTH = 1;
 
-/**
- * Sanitize user input by removing potentially harmful content
- * while preserving legitimate user intent
- */
 export const sanitizeMessage = (message: string): string => {
   return message
     .trim()
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
-    .replace(/\s+/g, ' '); // Normalize whitespace
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .replace(/\s+/g, ' ');
 };
 
-/**
- * Schema for chat message validation with enhanced security
- */
 export const chatMessageSchema = z.object({
   message: z
     .string()
@@ -29,16 +22,10 @@ export const chatMessageSchema = z.object({
   sessionId: z.string().uuid().optional(),
 });
 
-/**
- * Schema for conversation ID validation
- */
 export const getConversationSchema = z.object({
   conversationId: z.string().uuid('Invalid conversation ID format'),
 });
 
-/**
- * Schema for pagination (for future extensibility)
- */
 export const paginationSchema = z.object({
   limit: z.number().min(1).max(100).optional().default(50),
   offset: z.number().min(0).optional().default(0),
@@ -47,3 +34,4 @@ export const paginationSchema = z.object({
 export type ChatMessageInput = z.infer<typeof chatMessageSchema>;
 export type GetConversationInput = z.infer<typeof getConversationSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
+

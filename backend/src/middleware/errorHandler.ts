@@ -8,7 +8,6 @@ export const errorHandler = (
 ) => {
   console.error('Error:', err);
 
-  // Don't send error details in production
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   res.status(500).json({
@@ -30,3 +29,4 @@ export const notFoundHandler = (
     message: `Route ${req.method} ${req.path} not found`,
   });
 };
+

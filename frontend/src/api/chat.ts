@@ -23,9 +23,6 @@ export interface HistoryResponse {
   error?: string;
 }
 
-/**
- * Custom error class for API errors
- */
 export class APIError extends Error {
   constructor(
     message: string,
@@ -37,24 +34,15 @@ export class APIError extends Error {
   }
 }
 
-/**
- * Sleep utility for retry delays
- */
 const sleep = (ms: number): Promise<void> => 
   new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Retry configuration
- */
 const RETRY_CONFIG = {
   maxAttempts: 3,
   baseDelay: 1000,
   maxDelay: 5000,
 };
 
-/**
- * Enhanced fetch with timeout support
- */
 const fetchWithTimeout = async (
   url: string,
   options: RequestInit = {},
@@ -79,21 +67,15 @@ const fetchWithTimeout = async (
   }
 };
 
-/**
- * Determine if an error is retryable
- */
 const isRetryableError = (error: any, statusCode?: number): boolean => {
-  // Network errors are retryable
   if (error instanceof TypeError && error.message.includes('fetch')) {
     return true;
   }
   
-  // Timeout errors are retryable
   if (error instanceof APIError && error.retryable) {
     return true;
   }
   
-  // 5xx server errors are retryable
   if (statusCode && statusCode >= 500 && statusCode < 600) {
     return true;
   }
@@ -135,9 +117,6 @@ const withRetry = async <T>(
 };
 
 export const chatAPI = {
-  /**
-   * Send a message and get AI response with automatic retry
-   */
   sendMessage: async (message: string, sessionId?: string): Promise<ChatResponse> => {
     return withRetry(async () => {
       const response = await fetchWithTimeout(`${API_BASE_URL}/chat/message`, {
@@ -161,9 +140,6 @@ export const chatAPI = {
     });
   },
 
-  /**
-   * Get conversation history with automatic retry
-   */
   getHistory: async (conversationId: string): Promise<HistoryResponse> => {
     return withRetry(async () => {
       const response = await fetchWithTimeout(
@@ -183,9 +159,6 @@ export const chatAPI = {
     });
   },
 
-  /**
-   * Health check endpoint
-   */
   checkHealth: async (): Promise<boolean> => {
     try {
       const response = await fetchWithTimeout(`${API_BASE_URL}/chat/health`, {}, 5000);
@@ -196,3 +169,4 @@ export const chatAPI = {
     }
   },
 };
+

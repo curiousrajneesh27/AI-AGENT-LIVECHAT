@@ -6,36 +6,26 @@ import { chatMessageSchema } from '../validators/schemas';
 
 const router = Router();
 
-/**
- * POST /api/chat/message
- * Send a message and get AI response with comprehensive error handling
- */
 router.post('/message', validateBody(chatMessageSchema), async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
     const { message, sessionId } = req.body;
 
-    // Get or create conversation
     let conversationId = sessionId;
     if (!conversationId || !(await conversationService.exists(conversationId))) {
       const newConversation = await conversationService.create();
       conversationId = newConversation.id;
     }
 
-    // Save user message
     const userMessage = await messageService.create(conversationId, 'user', message);
-
-    // Get conversation history
     const history = await messageService.getRecentHistory(conversationId, 10);
 
-    // Generate AI reply
     const llmResponse = await generateAIReply(
-      history.slice(0, -1), // Exclude the message we just added
+      history.slice(0, -1),
       message
     );
 
-    // Handle LLM errors gracefully
     if (!llmResponse.success) {
       console.error('LLM Error:', llmResponse.error);
       
@@ -46,8 +36,6 @@ router.post('/message', validateBody(chatMessageSchema), async (req: Request, re
         retryable: llmResponse.error?.retryable || false,
       });
     }
-
-    // Save AI reply
     const aiMessage = await messageService.create(
       conversationId,
       'ai',
@@ -85,15 +73,10 @@ router.post('/message', validateBody(chatMessageSchema), async (req: Request, re
   }
 });
 
-/**
- * GET /api/chat/history/:conversationId
- * Get conversation history with validation
- */
 router.get('/history/:conversationId', async (req: Request, res: Response) => {
   try {
     const { conversationId } = req.params;
 
-    // Validate conversation ID format (basic UUID check)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(conversationId)) {
       return res.status(400).json({
@@ -131,10 +114,6 @@ router.get('/history/:conversationId', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /api/chat/health
- * Health check endpoint with detailed system status
- */
 router.get('/health', (req: Request, res: Response) => {
   const stats = getLLMStats();
   
@@ -154,10 +133,6 @@ router.get('/health', (req: Request, res: Response) => {
   });
 });
 
-/**
- * DELETE /api/chat/conversation/:conversationId
- * Delete a conversation and all its messages (for privacy/GDPR compliance)
- */
 router.delete('/conversation/:conversationId', async (req: Request, res: Response) => {
   try {
     const { conversationId } = req.params;

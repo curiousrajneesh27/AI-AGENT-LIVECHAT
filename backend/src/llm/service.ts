@@ -2,10 +2,6 @@ import OpenAI from 'openai';
 import { Message } from '../database/services';
 import { SYSTEM_PROMPT } from './knowledge';
 
-/**
- * LLM Service Configuration
- * Encapsulated for easy modification and testing
- */
 class LLMConfig {
   private static instance: LLMConfig;
   
@@ -21,7 +17,7 @@ class LLMConfig {
     this.temperature = parseFloat(process.env.TEMPERATURE || '0.7');
     this.model = process.env.MODEL || 'openai/gpt-3.5-turbo';
     this.maxRetries = 3;
-    this.timeout = 30000; // 30 seconds
+    this.timeout = 30000;
     this.maxHistoryMessages = 10;
   }
   
@@ -33,7 +29,6 @@ class LLMConfig {
   }
 }
 
-// Initialize OpenRouter client lazily to ensure env vars are loaded
 let openaiClient: OpenAI | null = null;
 
 const getOpenAIClient = (): OpenAI => {
@@ -80,19 +75,13 @@ export interface LLMResponse {
 const sleep = (ms: number): Promise<void> => 
   new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Calculate exponential backoff delay with jitter
- */
 const calculateBackoffDelay = (retryCount: number): number => {
-  const baseDelay = 1000; // 1 second
+  const baseDelay = 1000;
   const exponentialDelay = baseDelay * Math.pow(2, retryCount);
-  const jitter = Math.random() * 1000; // Add randomness to prevent thundering herd
-  return Math.min(exponentialDelay + jitter, 10000); // Cap at 10 seconds
+  const jitter = Math.random() * 1000;
+  return Math.min(exponentialDelay + jitter, 10000);
 };
 
-/**
- * Build conversation context for LLM
- */
 const buildConversationContext = (
   conversationHistory: Message[],
   userMessage: string,
@@ -105,7 +94,6 @@ const buildConversationContext = (
     },
   ];
 
-  // Add recent conversation history
   const recentHistory = conversationHistory.slice(-maxHistory);
   for (const msg of recentHistory) {
     messages.push({
@@ -114,7 +102,6 @@ const buildConversationContext = (
     });
   }
 
-  // Add current user message
   messages.push({
     role: 'user',
     content: userMessage,
@@ -123,11 +110,7 @@ const buildConversationContext = (
   return messages;
 };
 
-/**
- * Create user-friendly error from API error
- */
 const createLLMError = (error: any, retryCount: number, maxRetries: number): LLMError => {
-  // Timeout error
   if (error.name === 'AbortError' || error.code === 'ETIMEDOUT') {
     return {
       type: 'timeout',
@@ -136,7 +119,6 @@ const createLLMError = (error: any, retryCount: number, maxRetries: number): LLM
     };
   }
 
-  // Network errors
   if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND' || error.code === 'ECONNRESET') {
     return {
       type: 'network',
@@ -145,7 +127,6 @@ const createLLMError = (error: any, retryCount: number, maxRetries: number): LLM
     };
   }
 
-  // Authentication errors
   if (error.status === 401 || error.status === 403) {
     return {
       type: 'invalid_key',
@@ -175,7 +156,6 @@ const createLLMError = (error: any, retryCount: number, maxRetries: number): LLM
     };
   }
 
-  // Bad request errors (not retryable)
   if (error.status === 400) {
     return {
       type: 'invalid_response',
@@ -185,7 +165,6 @@ const createLLMError = (error: any, retryCount: number, maxRetries: number): LLM
     };
   }
 
-  // Unknown errors
   return {
     type: 'unknown',
     message: 'An unexpected error occurred. Please try again.',
@@ -193,13 +172,6 @@ const createLLMError = (error: any, retryCount: number, maxRetries: number): LLM
   };
 };
 
-/**
- * Generate AI reply using OpenRouter API with retry logic and comprehensive error handling
- * @param conversationHistory - Array of previous messages in the conversation
- * @param userMessage - The current user message
- * @param retryCount - Current retry attempt (used internally)
- * @returns LLMResponse object with reply or error
- */
 export const generateAIReply = async (
   conversationHistory: Message[],
   userMessage: string,
@@ -210,14 +182,12 @@ export const generateAIReply = async (
   try {
     const openai = getOpenAIClient();
     
-    // Build conversation context
     const messages = buildConversationContext(
       conversationHistory,
       userMessage,
       config.maxHistoryMessages
     );
 
-    // Call OpenRouter API with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), config.timeout);
 
@@ -237,7 +207,6 @@ export const generateAIReply = async (
 
       clearTimeout(timeoutId);
 
-      // Validate response
       const reply = completion.choices[0]?.message?.content;
       if (!reply || reply.trim().length === 0) {
         return {
@@ -284,9 +253,6 @@ export const generateAIReply = async (
   }
 };
 
-/**
- * Validate that OpenRouter API is configured correctly
- */
 export const validateLLMConfig = (): boolean => {
   try {
     if (!process.env.OPENROUTER_API_KEY) {
@@ -308,10 +274,6 @@ export const validateLLMConfig = (): boolean => {
   }
 };
 
-/**
- * Health check for LLM service
- * Tests basic connectivity without consuming many tokens
- */
 export const checkLLMHealth = async (): Promise<boolean> => {
   try {
     const testResponse = await generateAIReply([], 'Hello', 0);
@@ -322,9 +284,6 @@ export const checkLLMHealth = async (): Promise<boolean> => {
   }
 };
 
-/**
- * Get LLM service statistics (for monitoring/debugging)
- */
 export const getLLMStats = () => {
   const config = LLMConfig.getInstance();
   return {
@@ -337,3 +296,4 @@ export const getLLMStats = () => {
     configured: !!process.env.OPENROUTER_API_KEY,
   };
 };
+
