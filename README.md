@@ -2,12 +2,9 @@
 
 # 🤖 AI Live Chat Agent
 
-**Production-ready AI-powered customer support chat application**
+A production-ready AI-powered customer support chat application built with Node.js, TypeScript, Express, React, and OpenRouter LLM integration.
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit-00C7B7?style=flat&logo=vercel)](https://ai-agent-livechat.vercel.app/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/curiousrajneesh27/AI-AGENT-LIVECHAT)
-
-Built with Node.js • TypeScript • React • Express • SQLite
+🔗 **Live Demo**: [https://ai-agent-livechat.vercel.app](https://ai-agent-livechat.vercel.app/)
 
 </div>
 
@@ -15,38 +12,31 @@ Built with Node.js • TypeScript • React • Express • SQLite
 
 ## 📋 Overview
 
-A full-stack AI chat application with conversation persistence, session management, and intelligent response generation using OpenAI/OpenRouter APIs. Built with clean architecture, comprehensive error handling, and production-ready practices.
+This project demonstrates a minimal yet production-grade implementation of an AI chat agent for e-commerce customer support. It features real-time AI responses, persistent conversation history, and a clean, responsive UI.
 
-**Key Highlights:**
+**Key Features:**
 
-- Real-time AI responses with context awareness
-- Persistent conversations using SQLite
-- Session-based chat continuity
-- Input validation (client + server)
-- Beautiful, responsive UI
-
----
-
-## ✨ Features
-
-| Feature            | Description                                     |
-| :----------------- | :---------------------------------------------- |
-| 💬 **AI Chat**     | GPT-powered responses with conversation history |
-| 💾 **Persistence** | SQLite database for message storage             |
-| 🔁 **Sessions**    | Resume conversations across page reloads        |
-| 🛡️ **Validation**  | Zod schema validation on backend                |
-| 🎨 **Modern UI**   | Responsive design with typing indicators        |
-| ⚡ **Performance** | Optimized queries with database indexes         |
-| 🔒 **Security**    | Input sanitization, CORS, environment secrets   |
+- 💬 Real-time AI chat responses using OpenRouter API
+- 📊 SQLite database for conversation persistence
+- 🔄 Session-based conversation continuity
+- 🎨 Clean, responsive React UI
+- 🚀 Deployed on Render (backend) and Vercel (frontend)
+- 🔒 Production-grade CORS and error handling
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Architecture
 
-![Uploading diagram-export-12-23-2025-4_55_10-PM.png…]()
+### Architecture Diagram
 
+![System Architecture](./architecture-diagram.png)
 
+The application follows a three-tier architecture:
 
+1. **Frontend Layer**: React components (ChatWindow, ChatInput, ChatMessage) communicate with the backend via REST API
+2. **Backend Layer**: Express server with Chat Service orchestrating business logic, LLM Service for AI integration, and Chat Repository for database operations
+3. **Data Layer**: SQLite database with Conversations and Messages tables for persistent storage
+4. **External Service**: OpenRouter API for LLM-powered responses
 
 ## ✨ Features
 
