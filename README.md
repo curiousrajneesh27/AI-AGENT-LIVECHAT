@@ -29,7 +29,7 @@ This project demonstrates a minimal yet production-grade implementation of an AI
 
 ### Architecture Diagram
 
-![Uploading diagram-export-12-23-2025-4_55_10-PM.png…]()
+diagram-export-12-23-2025-4_55_10-PM.png
 
 
 The application follows a three-tier architecture:
