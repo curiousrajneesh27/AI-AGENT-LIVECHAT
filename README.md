@@ -1,7 +1,9 @@
 AI Live Chat Agent
 A production-ready AI-powered customer support chat application built with enterprise-grade architecture and real-time messaging capabilities.
 Live Demo: https://ai-agent-livechat.vercel.app/
-Show Image
+
+<img width="1896" height="644" alt="diagram-export-12-23-2025-4_55_10-PM" src="https://github.com/user-attachments/assets/1a37f583-46a5-4137-8c2c-3240f16ca196" />
+
 
 📋 Table of Contents
 
