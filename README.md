@@ -1,68 +1,184 @@
-# AI Live Chat Agent
+AI Live Chat Agent
+A production-ready, extensible AI-powered customer support chat application built for Spur’s Founding Full‑Stack Engineer take‑home.
+The goal: design and ship a realistic slice of Spur’s core product – an AI agent that can handle customer conversations reliably, be easy to extend to new channels, and withstand “real world” misuse.
 
-A production-ready AI-powered customer support chat application built for Spur's Full-Stack Engineer take-home assignment.
+Live Demo: https://ai-agent-livechat.vercel.app/
 
-**Live Demo**: https://ai-agent-livechat.vercel.app/
+1. What This Agent Does
+This project simulates a Spur-style AI support agent embedded in a website chat widget for a fictional e‑commerce store.
 
-## Features
+Users type questions like “What’s your return policy?” or “Do you ship to the USA?” and get contextual, FAQ‑aware answers from an LLM.
 
-✅ **Real-time AI Chat**: Powered by OpenAI's GPT models  
-✅ **Conversation Persistence**: SQLite database for message history  
-✅ **Session Management**: Resume conversations across page reloads  
-✅ **Beautiful UI**: Modern, responsive chat interface  
-✅ **Error Handling**: Graceful handling of API failures, timeouts, and edge cases  
-✅ **Input Validation**: Prevents empty messages, handles long inputs  
-✅ **Domain Knowledge**: Pre-loaded with fictional store FAQs
-✅ **Typing Indicators**: Real-time feedback during AI responses  
-✅ **Auto-scroll**: Smooth scrolling to latest messages
+Every message (user + AI) is persisted to a SQLite database, associated with a conversation/session so chats can be resumed across reloads.
 
-## Tech Stack
+The backend wraps the LLM behind a clean service boundary, making it easy to swap providers or add tools later.
 
-**Backend:**
+Input validation, error handling, and guardrails ensure the app behaves well under bad input, API failures, and network issues.
 
-- Node.js + TypeScript
-- Express.js (REST API)
-- SQLite (better-sqlite3) for data persistence
-- OpenAI API for LLM integration
-- Zod for input validation
-- Open Router APi key
+The design mirrors how a founding engineer would build a first version of Spur’s live chat channel, with clear seams to later plug in WhatsApp, Instagram, or other sources.
 
-**Frontend:**
+2. Features
+Real AI chat
+Uses OpenAI-compatible models (via OpenAI or OpenRouter) with a focused system prompt and conversation history for contextual answers.
 
-- React 18 + TypeScript
-- Vite (build tool)
-- CSS3 (custom styling, no frameworks)
+Conversation persistence
+SQLite database stores conversations and messages so a user can reload and continue where they left off.
 
-## Prerequisites
+Session management
+Frontend tracks a sessionId and passes it with every request, mapping neatly to a conversation in the DB.
 
-- Node.js 18+ and npm
-- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
-- Open Router Api key(Preffered free api keys)
+Clean, minimal chat UI
+Modern, responsive chat interface with clear user/agent separation, auto-scroll, and typing indicators.
 
-## Quick Start
+Robust input validation
+Zod-based schemas on the backend enforce non-empty messages, max length, and correct types; frontend blocks obviously invalid input before network calls.
 
-### 1. Clone and Install
+Guardrails & error handling
+Central error middleware normalizes LLM, network, and DB errors into user-friendly messages so the app fails gracefully instead of crashing.
 
-```bash
+Domain knowledge baked in
+A knowledge.ts module encapsulates fictional store FAQs (shipping, returns, support, payments, warranty) and feeds this into the LLM prompt so answers are stable and testable.
+
+Production‑style structure
+Routes → middleware → services → DB/LLM layers, making it obvious where to add new channels, tools, or business logic.
+
+3. System Architecture
+The system is intentionally small but structured like a real product.
+
+High-level flow:
+
+User Browser / Chat Widget
+
+Renders the chat UI, accepts user input, shows AI replies.
+
+Maintains a sessionId in sessionStorage to reuse the same conversation.
+
+Frontend (React + Vite + TypeScript)
+
+Sends POST /api/chat/message with { message, sessionId? } to the backend.
+
+Updates UI optimistically with the user’s message, then appends the AI reply and auto-scrolls.
+
+Shows typing indicator and disables input while waiting for the response.
+
+Backend (Node.js + Express + TypeScript)
+
+Routes layer (routes/chat.ts) exposes:
+
+POST /api/chat/message – send message, get AI reply.
+
+GET /api/chat/history/:conversationId – fetch full message history.
+
+GET /api/chat/health – health check.
+
+Validation middleware (middleware/validation.ts) runs Zod schemas to enforce message length and structure before hitting business logic.
+
+Services layer:
+
+database/services.ts handles conversations/messages CRUD.
+
+llm/service.ts encapsulates prompt construction and LLM calls.
+
+Error middleware (middleware/errorHandler.ts) catches thrown errors and converts them into safe JSON responses.
+
+Database (SQLite via better-sqlite3)
+
+Conversations
+
+id (UUID)
+
+createdAt
+
+Messages
+
+id (UUID)
+
+conversationId (FK)
+
+sender ("user" | "ai")
+
+text
+
+timestamp
+
+A single conversation has many messages; every request persists both sides of the dialogue.
+
+LLM Provider (OpenAI / OpenRouter)
+
+Backend calls the provider through a single generateReply(history, userMessage)-style function.
+
+Uses:
+
+System prompt describing the e‑commerce store and policies.
+
+Truncated conversation history (for cost control) so replies stay in-context.
+
+Timeouts, API key issues, and rate limits are caught and converted to friendly “agent temporarily unavailable” messages.
+
+The attached architecture diagram reflects exactly this flow: browser → frontend → backend (validation, conversation lookup, DB read/write, LLM call) → response back, with explicit error and guardrail paths.
+​
+
+4. Tech Stack
+Backend
+
+Node.js 18+
+
+TypeScript
+
+Express.js (REST API)
+
+SQLite (better-sqlite3) for persistence
+
+OpenAI-compatible LLM API (OpenAI / OpenRouter)
+
+Zod for schema validation
+
+Layered architecture: routes, middleware, services, infrastructure
+
+Frontend
+
+React 18 + TypeScript
+
+Vite bundler
+
+Custom CSS (no UI framework) for full control over the chat experience
+
+This mirrors a realistic early-stage stack: simple to deploy, easy to reason about, and ready to be split into separate services later if scale demands.
+
+5. Running the Project
+5.1. Prerequisites
+Node.js 18+
+
+npm or pnpm
+
+An OpenAI or OpenRouter API key
+
+5.2. Clone & Install
+bash
+git clone <your-repo-url> AI-LIVE-CHAT
 cd AI-LIVE-CHAT
+
+# Root scripts
 npm install
-cd backend && npm install
-cd ../frontend && npm install
+
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd ../frontend
+npm install
+
 cd ..
-```
+5.3. Environment Variables (Backend)
+Create backend/.env from the example:
 
-### 2. Configure Environment Variables
-
-Create a `.env` file in the `backend` directory:
-
-```bash
+bash
 cp .env.example backend/.env
-```
+Edit backend/.env:
 
-Edit `backend/.env` and add your OpenAI API key:
-
-```env
-OPENAI_API_KEY=sk-your-actual-api-key-here
+text
+OPENAI_API_KEY=sk-your-key-here
 PORT=5000
 NODE_ENV=development
 DATABASE_PATH=./database.sqlite
@@ -70,107 +186,43 @@ MODEL=gpt-3.5-turbo
 MAX_TOKENS=500
 TEMPERATURE=0.7
 MAX_MESSAGE_LENGTH=2000
-```
+You can also point OPENAI_API_KEY and MODEL to an OpenRouter-compatible model if preferred.
 
-### 3. Run the Application
+5.4. Start in Development
+Option A – one command (root):
 
-**Option A: Run both servers concurrently (recommended)**
-
-```bash
+bash
 npm run dev
-```
+Backend: http://localhost:5000
 
-This starts:
+Frontend: http://localhost:3000
 
-- Backend API on `http://localhost:5000`
-- Frontend on `http://localhost:3000`
+Option B – separate terminals
 
-**Option B: Run separately**
-
-Terminal 1 (Backend):
-
-```bash
+bash
+# Terminal 1 – backend
 cd backend
 npm run dev
-```
 
-Terminal 2 (Frontend):
-
-```bash
+# Terminal 2 – frontend
 cd frontend
 npm run dev
-```
+Then open http://localhost:3000 in your browser.
 
-### 4. Open the App
+6. API Overview
+POST /api/chat/message
+Send a new user message and get the AI reply.
 
-Navigate to `http://localhost:3000` in your browser.
+Request
 
-## Project Structure
-
-```
-AI-LIVE-CHAT/
-├── backend/
-│   ├── src/
-│   │   ├── database/
-│   │   │   ├── db.ts              # Database initialization
-│   │   │   └── services.ts        # CRUD operations for conversations & messages
-│   │   ├── llm/
-│   │   │   ├── service.ts         # OpenAI API integration
-│   │   │   └── knowledge.ts       # Store FAQs & system prompt
-│   │   ├── middleware/
-│   │   │   ├── validation.ts      # Zod validation middleware
-│   │   │   └── errorHandler.ts    # Global error handling
-│   │   ├── routes/
-│   │   │   └── chat.ts            # Chat endpoints
-│   │   ├── validators/
-│   │   │   └── schemas.ts         # Zod schemas
-│   │   └── index.ts               # Express app entry point
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── nodemon.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── chat.ts            # API client
-│   │   ├── components/
-│   │   │   ├── Message.tsx        # Message bubble component
-│   │   │   ├── Message.css
-│   │   │   ├── TypingIndicator.tsx
-│   │   │   └── TypingIndicator.css
-│   │   ├── App.tsx                # Main chat component
-│   │   ├── App.css
-│   │   ├── main.tsx               # React entry point
-│   │   └── index.css
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── vite.config.ts
-│   └── index.html
-│
-├── package.json                    # Root package for scripts
-├── .env.example
-├── .gitignore
-└── README.md
-```
-
-## API Endpoints
-
-### POST `/api/chat/message`
-
-Send a message and receive AI response.
-
-**Request:**
-
-```json
+json
 {
   "message": "What's your return policy?",
   "sessionId": "optional-uuid"
 }
-```
+Response
 
-**Response:**
-
-```json
+json
 {
   "success": true,
   "reply": "We offer a 30-day return policy...",
@@ -178,15 +230,12 @@ Send a message and receive AI response.
   "messageId": "uuid",
   "timestamp": "2025-12-21T10:30:00Z"
 }
-```
+GET /api/chat/history/:conversationId
+Fetch full conversation history for a given conversation.
 
-### GET `/api/chat/history/:conversationId`
+Response
 
-Retrieve conversation history.
-
-**Response:**
-
-```json
+json
 {
   "success": true,
   "conversationId": "uuid",
@@ -199,261 +248,152 @@ Retrieve conversation history.
     }
   ]
 }
-```
+GET /api/chat/health
+Simple health check, useful for uptime checks and deployment verification.
+
+7. Project Structure
+text
+AI-LIVE-CHAT/
+├── backend/
+│   ├── src/
+│   │   ├── database/
+│   │   │   ├── db.ts              # SQLite initialization
+│   │   │   └── services.ts        # Conversation & message CRUD
+│   │   ├── llm/
+│   │   │   ├── service.ts         # LLM integration & prompt building
+│   │   │   └── knowledge.ts       # Store FAQs & system prompt content
+│   │   ├── middleware/
+│   │   │   ├── validation.ts      # Zod validation middleware
+│   │   │   └── errorHandler.ts    # Central error handling
+│   │   ├── routes/
+│   │   │   └── chat.ts            # Chat-related endpoints
+│   │   ├── validators/
+│   │   │   └── schemas.ts         # Zod schemas for requests
+│   │   └── index.ts               # Express app bootstrap
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── nodemon.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── chat.ts            # API client wrapper
+│   │   ├── components/
+│   │   │   ├── Message.tsx        # Message bubble
+│   │   │   ├── Message.css
+│   │   │   ├── TypingIndicator.tsx
+│   │   │   └── TypingIndicator.css
+│   │   ├── App.tsx                # Main chat experience
+│   │   ├── App.css
+│   │   ├── main.tsx               # React entry
+│   │   └── index.css
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── index.html
+│
+├── package.json                   # Root scripts (concurrent dev, etc.)
+├── .env.example
+├── .gitignore
+└── README.md
+This separation makes it straightforward to:
 
-### GET `/api/chat/health`
+Add new routes (e.g., /api/whatsapp/message) that reuse the same services.
 
-Health check endpoint.
+Swap SQLite for PostgreSQL without touching route or UI code.
 
-## Architecture Decisions
+Replace OpenAI with another provider by editing only the LLM layer.
 
-### Backend Architecture
+8. Domain Knowledge & Prompting
+The agent is configured as support for a fictional “TechGadget Store”.
 
-**Layered Design:**
+Embedded knowledge includes:
 
-- **Routes**: Handle HTTP requests/responses
-- **Services**: Business logic (database, LLM)
-- **Middleware**: Validation, error handling
-- **Database**: Data persistence layer
+Shipping policy
+Free shipping above a threshold, standard vs express, typical delivery times.
 
-**Why SQLite?**
+Return policy
+30‑day returns, free for defective items.
 
-- Zero configuration for development
-- Easy migration to PostgreSQL (minimal code changes)
-- Perfect for prototypes and single-server deployments
+Support hours
+Weekday support hours and contact methods.
 
-**LLM Integration:**
+Payment methods & warranty
+Major cards, PayPal, Apple Pay, and default manufacturer warranty.
 
-- Encapsulated in `llm/service.ts` for easy provider switching
-- Timeout protection (30 seconds)
-- Comprehensive error handling (rate limits, API errors, timeouts)
-- Conversation history included for context-aware responses
+This content lives in llm/knowledge.ts and is injected into the system prompt so responses are consistent and testable. The LLM also receives recent conversation history, enabling follow-up questions like “What about international shipping?” to be answered in context.
 
-### Frontend Architecture
+9. Error Handling & Resilience
+Empty message → rejected by Zod + frontend check with a clear error.
 
-**React + TypeScript:**
+Messages beyond MAX_MESSAGE_LENGTH → blocked with a friendly message.
 
-- Type safety for API contracts
-- Component-based architecture for reusability
-- Hooks for state management (useState, useEffect, useRef)
+Invalid / expired API keys → caught in LLM service and surfaced as “agent unavailable” rather than crashing the server.
 
-**Session Management:**
+Rate limits, timeouts, and provider outages → wrapped in a unified error shape by errorHandler.ts.
 
-- Stores session ID in sessionStorage
-- Automatically resumes conversations on page reload
-- Gracefully handles session not found
+DB issues → caught and surfaced as 5xx responses, with the UI showing a general error instead of failing silently.
 
-**UX Features:**
+As a founding engineer, the aim is to avoid “one tiny change and everything explodes” by centralizing validation and error handling.
 
-- Optimistic updates (user messages appear immediately)
-- Auto-scroll to latest messages
-- Typing indicator during AI processing
-- Error messages displayed inline
-- Disabled input during loading
+10. Deployment
+Backend
+Can be deployed to Render, Railway, Fly.io, or any Node host.
 
-## Domain Knowledge
+Typical configuration:
 
-The AI agent is pre-loaded with knowledge about a fictional e-commerce store (TechGadget Store):
+Build command:
+cd backend && npm install && npm run build
 
-- **Shipping Policy**: Free shipping over $50, standard/express options
-- **Return Policy**: 30-day returns, free for defects
-- **Support Hours**: Mon-Fri 9 AM - 6 PM EST
-- **Payment Methods**: Major credit cards, PayPal, Apple Pay, etc.
-- **Warranty**: Manufacturer warranty included
+Start command:
+cd backend && npm start
 
-Try asking:
+Environment:
 
-- "What's your return policy?"
-- "Do you offer free shipping?"
-- "What are your support hours?"
-- "How long does shipping take?"
+OPENAI_API_KEY
 
-## Error Handling
+NODE_ENV=production
 
-The application handles:
+DATABASE_PATH=/data/database.sqlite (or similar)
 
-- ❌ Empty messages (frontend + backend validation)
-- ❌ Messages exceeding 2000 characters
-- ❌ Invalid/expired API keys
-- ❌ Rate limiting (429 errors)
-- ❌ Network timeouts (30 second limit)
-- ❌ LLM service outages
-- ❌ Database errors
-- ❌ Malformed requests
+Frontend
+Optimized for Vercel/Netlify.
 
-All errors result in user-friendly messages, never crashes.
+Base directory: frontend
 
-## Deployment
+Build command: npm run build
 
-### Backend (Render/Railway/Fly.io)
+Publish directory: frontend/dist
 
-1. Create a new web service
-2. Connect your GitHub repository
-3. Set environment variables:
-   - `OPENAI_API_KEY`
-   - `NODE_ENV=production`
-   - `PORT` (usually auto-detected)
-4. Build command: `cd backend && npm install && npm run build`
-5. Start command: `cd backend && npm start`
+Env:
 
-### Frontend (Vercel/Netlify)
+VITE_API_URL=https://your-backend-domain.com/api
 
-1. Connect your GitHub repository
-2. Set build settings:
-   - Base directory: `frontend`
-   - Build command: `npm run build`
-   - Publish directory: `frontend/dist`
-3. Environment variables:
-   - `VITE_API_URL=https://your-backend-url.com/api`
+The live demo uses this setup, with the frontend deployed to Vercel and the backend deployed separately.
 
-## Trade-offs & Future Improvements
+11. Trade‑offs & “If I Had More Time…”
+Made for this assignment
 
-### If I Had More Time...
+SQLite over PostgreSQL – zero config, ideal for a take‑home; the service layer keeps the migration path to Postgres straightforward.
 
-**🔐 Authentication & Authorization**
+REST over WebSockets – simpler and enough for request/response style support; streaming and real-time presence can be layered on later.
 
-- User accounts and login
-- Conversation ownership
-- Admin dashboard
+No Redis – premature for a single-node prototype; left as a clear next step for caching and rate‑limit tracking.
 
-**📊 Analytics & Monitoring**
+React instead of Svelte – chosen for speed and reliability given existing experience, but the architecture is framework‑agnostic.
 
-- Track conversation metrics
-- User satisfaction ratings
-- LLM performance monitoring
+Next steps if this were production
 
-**🚀 Performance Optimizations**
+Add auth and multi-tenant support so multiple stores can use the same infrastructure.
 
-- Redis caching for frequent queries
-- Connection pooling
-- CDN for static assets
-- LLM response streaming
+Introduce role-based tools (refund creation, order lookup) behind the LLM.
 
-**🔌 Additional Integrations**
+Implement LLM streaming for partial responses and better UX.
 
-- Multi-channel support (WhatsApp, Instagram, Facebook)
-- CRM integrations (Salesforce, HubSpot)
-- E-commerce platforms (Shopify)
+Add observability: structured logs, metrics, and traces around LLM calls and latency.
 
-**🧪 Testing**
+Build a Spur-style channel abstraction where web chat, WhatsApp, and Instagram are just different “entry points” into the same conversation + LLM pipeline.
 
-- Unit tests (Jest/Vitest)
-- Integration tests
-- E2E tests (Playwright)
-
-**🛡️ Security Enhancements**
-
-- Rate limiting per IP
-- API key rotation
-- Input sanitization against XSS
-- CSRF protection
-
-**💬 Advanced Features**
-
-- File uploads (images, documents)
-- Rich message formatting (Markdown)
-- Agent handoff to human support
-- Multi-language support
-
-### Design Decisions Explained
-
-**Why not Redis?**
-
-- Adds deployment complexity
-- SQLite is sufficient for this scale
-- Easy to add later for session storage
-
-**Why REST over WebSockets?**
-
-- Simpler implementation
-- Adequate for current use case
-- Polling could be added for real-time updates
-
-**Why gpt-3.5-turbo?**
-
-- Cost-effective for demos
-- Fast response times
-- Easy to upgrade to GPT-4
-
-**Why not Svelte?**
-
-- React has broader adoption (team velocity)
-- Larger ecosystem and community
-- Can switch if team prefers Svelte
-
-## Development
-
-### Running Tests
-
-```bash
-# Backend tests (when implemented)
-cd backend && npm test
-
-# Frontend tests (when implemented)
-cd frontend && npm test
-```
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-Builds:
-
-- Backend: `backend/dist/`
-- Frontend: `frontend/dist/`
-
-### Linting & Formatting
-
-```bash
-# Backend
-cd backend && npm run lint
-
-# Frontend
-cd frontend && npm run lint
-```
-
-## Troubleshooting
-
-**"Invalid API key" error:**
-
-- Check your `.env` file has `OPENAI_API_KEY` set
-- Verify the key is active on OpenAI dashboard
-- Restart the backend server after changing `.env`
-
-**"Failed to fetch" / CORS errors:**
-
-- Ensure backend is running on port 5000
-- Check Vite proxy configuration in `frontend/vite.config.ts`
-
-**Database errors:**
-
-- Delete `backend/database.sqlite` and restart
-- Check file permissions in the backend directory
-
-**Port already in use:**
-
-```bash
-# Kill process on port 5000 (Windows)
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-
-# Kill process on port 3000
-netstat -ano | findstr :3000
-taskkill /PID <PID> /F
-```
-
-## License
-
-MIT
-
-## Author
-
-Rajneesh verma 
-
----
-
-**Estimated Development Time**: ~8 hours
-
-**Last Updated**: December 23, 2025
+12. Author
+Built by Rajneesh Verma as part of Spur’s Founding Full‑Stack Engineer take‑home.
+This codebase is written the way it would be as a first slice of a real product: minimal, pragmatic, but with clear extension points for the next 6–12 months of building.
