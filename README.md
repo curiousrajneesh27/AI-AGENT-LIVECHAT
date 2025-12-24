@@ -351,7 +351,7 @@ MIT License - Free to use, modify, and distribute.
 
 ## Author
 
-**Rajneesh Verma**
+**Rajneesh**
 
 - GitHub: [@curiousrajneesh27](https://github.com/curiousrajneesh27)
 - Live Demo: [https://ai-agent-livechat.vercel.app](https://ai-agent-livechat.vercel.app)
