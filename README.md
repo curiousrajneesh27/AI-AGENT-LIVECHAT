@@ -349,4 +349,13 @@ MIT License - Free to use, modify, and distribute.
 
 ---
 
+## Author
+
+**Rajneesh Verma**
+
+- GitHub: [@curiousrajneesh27](https://github.com/curiousrajneesh27)
+- Live Demo: [https://ai-agent-livechat.vercel.app](https://ai-agent-livechat.vercel.app)
+
+---
+
 **Built with React, TypeScript, Node.js, Express, and OpenRouter AI**
