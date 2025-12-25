@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { initDatabase } from './database/db';
 import { validateLLMConfig } from './llm/service';
 import chatRoutes from './routes/chat';
+import authRoutes from './routes/auth';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 // Load environment variables from .env file
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
 // Root endpoint
